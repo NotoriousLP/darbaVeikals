@@ -26,7 +26,7 @@ public class Dators {
     public Komponente[] getKomponentes() {
         return komponentes;
     }
-
+    
     
     public String toString() {
         String rezultats = "Dators: " + nosaukums + "\nKomponentes:\n";
