@@ -60,12 +60,12 @@ public class Create_PC {
             pcName = "Dators " + System.currentTimeMillis(); 
         }
 
-        String pcDetails = "Dators: " + pcName + "\n" +
-                           "Motherboard: " + motherboard + "\n" +
-                           "CPU: " + cpu + "\n" +
-                           "GPU: " + gpu + "\n" +
-                           "RAM: " + ram + "\n" +
-                           "Storage: " + storage + "\n";
+        String pcDetails = "Dators: " + pcName + " \n" +
+                           "Motherboard: " + motherboard + " \n" +
+                           "CPU: " + cpu + " \n" +
+                           "GPU: " + gpu + " \n" +
+                           "RAM: " + ram + " \n" +
+                           "Storage: " + storage + " \n";
 
         createdPCs.add(pcDetails); 
         JOptionPane.showMessageDialog(null, "Izveidotais dators: " + pcDetails);
@@ -109,5 +109,9 @@ public class Create_PC {
         }
 
         return selected; 
+    }
+    
+    public static List<String> getCreatedPCs() {
+        return createdPCs;
     }
 }

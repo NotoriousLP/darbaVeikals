@@ -46,7 +46,7 @@ public class Izvelne {
                             createComponents.createComponent(); 
                             break;
                         case "Apskatīt klientus":
-                       
+                            orderPC.viewClients();
                             break;
                         case "Apskatīt datorus":
                         	createPC.viewPCs(); 
