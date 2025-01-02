@@ -3,6 +3,9 @@ package darbaVeikals;
 import javax.swing.JOptionPane;
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 
 public class Izvelne {
@@ -12,8 +15,7 @@ public class Izvelne {
         Order_PC orderPC = new Order_PC();
         Create_PC createPC = new Create_PC();
         Create_Com createComponents = Create_Com.getInstance();
-
-    
+        DatabaseConnection.initializeDatabase();
         while (true) {
         
             JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));

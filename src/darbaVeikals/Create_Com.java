@@ -1,6 +1,11 @@
 package darbaVeikals;
 
 import javax.swing.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,25 +20,6 @@ public class Create_Com {
 
  
     private static Create_Com instance;
-
-
-    private Create_Com() {
-      
-        motherboards.add("Asus Z490");
-        motherboards.add("Gigabyte B450");
-
-        cpus.add("Intel i5-11600K");
-        cpus.add("AMD Ryzen 5 5600X");
-
-        gpus.add("NVIDIA RTX 3080");
-        gpus.add("AMD Radeon RX 6800");
-
-        rams.add("Corsair Vengeance 16GB");
-        rams.add("G.Skill Ripjaws 16GB");
-
-        storages.add("Samsung 970 Evo 1TB");
-        storages.add("Crucial P3 500GB");
-    }
 
     
     public static Create_Com getInstance() {
@@ -121,7 +107,8 @@ public class Create_Com {
             case 0:
                 String newComponent = JOptionPane.showInputDialog("Ievadiet " + componentType + ":");
                 if (newComponent != null && !newComponent.isEmpty()) {
-                    componentList.add(newComponent); 
+                    //componentList.add(newComponent); 
+                    saveComponentToDB(componentType, newComponent);
                     JOptionPane.showMessageDialog(null, componentType + " pievienots: " + newComponent);
                 } else {
                     JOptionPane.showMessageDialog(null, "Nekas netika pievienots.");
@@ -129,14 +116,10 @@ public class Create_Com {
                 handleComponent(componentType, componentList); 
                 break;
             case 1:
-                if (componentList.isEmpty()) {
+                if (componentType.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Nav pievienots nevienas " + componentType + "s.");
                 } else {
-                    StringBuilder listStr = new StringBuilder("Esošie " + componentType + "s:\n");
-                    for (String comp : componentList) {
-                        listStr.append(comp).append("\n");
-                    }
-                    JOptionPane.showMessageDialog(null, listStr.toString());
+                	getComponentsFromDBList(componentType);
                 }
                 handleComponent(componentType, componentList); 
                 break;
@@ -148,4 +131,59 @@ public class Create_Com {
                 break;
         }
     }
+    
+    public void saveComponentToDB(String type, String name) {
+        String insert = "INSERT INTO Komponente (type, name) VALUES (?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            if (conn == null || conn.isClosed()) {
+                throw new SQLException("Savienojums ir aizvērts vai nav pieejams.");
+            }
+            try (PreparedStatement pstmt = conn.prepareStatement(insert)) {
+                pstmt.setString(1, type);
+                pstmt.setString(2, name);
+                pstmt.executeUpdate();
+                System.out.println("Komponente pievienota: " + name);
+            }
+        } catch (SQLException e) {
+            System.err.println("Kļūda, pievienojot komponenti: " + e.getMessage());
+        }
+    }
+
+    public List<String> getComponentsFromDB(String type) {
+        List<String> components = new ArrayList<>();
+        String query = "SELECT name FROM Komponente WHERE type = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, type);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                components.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+        	System.out.println("Kļūda, izgūstot komponentes: " + e.getMessage());
+        }
+        return components;
+    }
+    
+    public List<String> getComponentsFromDBList(String type) {
+        List<String> components = new ArrayList<>();
+        String query = "SELECT name FROM Komponente WHERE type = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, type);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                components.add(rs.getString("name"));
+            }
+            if (components.isEmpty()) {
+            	JOptionPane.showMessageDialog(null, "Nav pieejamu " + type + " komponentu datubāzē.");
+            } else {
+            	JOptionPane.showMessageDialog(null, "Atrastas " + type + " komponentes:\n" + String.join("\n", components));
+            }
+        } catch (SQLException e) {
+        	System.out.println("Kļūda, izgūstot komponentes: " + e.getMessage());
+        }
+        return components;
+    }
+
 }

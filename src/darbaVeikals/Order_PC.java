@@ -1,15 +1,13 @@
 package darbaVeikals;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Order_PC {
 
-    private static List<Klienti> klientuPasutijumi = new ArrayList<>();
-
     public void orderPC() {
-        if (Create_PC.getCreatedPCs().isEmpty()) { // Pārbauda, vai datoru saraksts ir tukšs
+        List<String> createdPCs = Create_PC.getCreatedPCsFromDB(); // Iegūst datoru sarakstu no datubāzes
+        if (createdPCs.isEmpty()) { // Pārbauda, vai datoru saraksts ir tukšs
             JOptionPane.showMessageDialog(null, "Nav pieejamu datoru pasūtīšanai!");
             Izvelne.main(new String[]{});
             return;
@@ -28,25 +26,33 @@ public class Order_PC {
         String adrese = JOptionPane.showInputDialog("Ievadiet savu mājas adresi:");
         if (adrese == null || adrese.isEmpty()) return;
 
-        // Izvēlas datoru no izveidotajiem datoriem
-        String selectedPC = choosePC();
+        // Izvēlas datoru no pieejamajiem datoriem
+        String selectedPC = choosePC(createdPCs);
         if (selectedPC == null) return;
 
-        // Izveido jaunu klienta ierakstu
+        // Iegūst datora ID no datubāzes
+        int computerId = Create_PC.getComputerIdByName(selectedPC);
+        if (computerId == -1) {
+            JOptionPane.showMessageDialog(null, "Kļūda: Izvēlētais dators netika atrasts datubāzē!");
+            return;
+        }
+
+        // Izveido jaunu klienta ierakstu un saglabā datubāzē
         Klienti klients = new Klienti(vards, uzvards, telefons, adrese, selectedPC);
-        klientuPasutijumi.add(klients);
+        Klienti.saveClientToDB(klients, computerId);
 
         JOptionPane.showMessageDialog(null, "Paldies! Jūsu pasūtījums ir pieņemts:\n" + klients);
         Izvelne.main(new String[]{});
     }
 
     public void viewClients() {
-        if (klientuPasutijumi.isEmpty()) { // Pārbauda, vai ir reģistrēti pasūtījumi
+        List<Klienti> klienti = Klienti.getClientsFromDB(); // Iegūst klientus no datubāzes
+        if (klienti.isEmpty()) { // Pārbauda, vai ir reģistrēti pasūtījumi
             JOptionPane.showMessageDialog(null, "Nav reģistrētu klientu!");
         } else {
             // Izvada visus klientus
             StringBuilder klientuSaraksts = new StringBuilder("Klientu pasūtījumi:\n");
-            for (Klienti klients : klientuPasutijumi) {
+            for (Klienti klients : klienti) {
                 klientuSaraksts.append(klients).append("\n\n");
             }
             JOptionPane.showMessageDialog(null, klientuSaraksts.toString());
@@ -54,12 +60,11 @@ public class Order_PC {
         Izvelne.main(new String[]{});
     }
 
-    private String choosePC() {
-        List<String> createdPCs = Create_PC.getCreatedPCs(); // Iegūst datoru sarakstu
-        String[] pcArray = createdPCs.toArray(new String[0]);
+    private String choosePC(List<String> pcs) {
+        String[] pcArray = pcs.toArray(new String[0]);
 
         // Izvēlas datoru no saraksta
-        String selectedPC = (String) JOptionPane.showInputDialog(
+        return (String) JOptionPane.showInputDialog(
                 null,
                 "Izvēlieties datoru pasūtīšanai:",
                 "Datoru izvēle",
@@ -68,7 +73,5 @@ public class Order_PC {
                 pcArray,
                 pcArray.length > 0 ? pcArray[0] : null
         );
-
-        return selectedPC;
     }
 }
