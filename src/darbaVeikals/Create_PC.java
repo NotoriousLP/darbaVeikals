@@ -8,7 +8,7 @@ import java.sql.*;
 public class Create_PC {
 
     private Create_Com createComponents = Create_Com.getInstance(); 
-    private static List<String> createdPCs = new ArrayList<>();
+
     
 
     public void createPC() {
@@ -103,11 +103,7 @@ public class Create_PC {
 
         return selected; 
     }
-    
-    public static List<String> getCreatedPCs() {
-        return createdPCs;
-    }
-    
+   
     public int savePCToDB(String name) {
         String insert = "INSERT INTO Dators (name) VALUES (?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -181,4 +177,57 @@ public class Create_PC {
         return -1;
     }
     
+    public void deletePC() {
+        List<String> pcs = getCreatedPCsFromDB(); // Iegūst datorus no datubāzes
+        if (pcs.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nav pieejamu datoru dzēšanai!");
+            Izvelne.main(new String[]{});
+        }
+
+        // Ļauj lietotājam izvēlēties datoru dzēšanai
+        String selectedPC = (String) JOptionPane.showInputDialog(
+                null,
+                "Izvēlieties datoru dzēšanai:",
+                "Datoru dzēšana",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                pcs.toArray(),
+                pcs.get(0)
+        );
+
+        if (selectedPC == null) Izvelne.main(new String[]{}); // Lietotājs atcēla izvēli
+
+        int confirm = JOptionPane.showConfirmDialog(
+                null,
+                "Vai tiešām vēlaties dzēst datoru: " + selectedPC + "?",
+                "Apstiprinājums",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (deletePCFromDB(selectedPC)) {
+                JOptionPane.showMessageDialog(null, "Dators veiksmīgi dzēsts!");
+                Izvelne.main(new String[]{});
+            } else {
+                JOptionPane.showMessageDialog(null, "Kļūda, dzēšot datoru!");
+                Izvelne.main(new String[]{});
+            }
+        }else {
+        	Izvelne.main(new String[]{});
+        }
+    }
+
+    private boolean deletePCFromDB(String pcName) {
+        String deletePCQuery = "DELETE FROM Dators WHERE name = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(deletePCQuery)) {
+            pstmt.setString(1, pcName);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Kļūda, dzēšot datoru: " + e.getMessage());
+        }
+        return false;
+    }
+
 }

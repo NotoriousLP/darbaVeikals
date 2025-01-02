@@ -29,27 +29,6 @@ public class Create_Com {
         return instance;
     }
 
-    public List<String> getMotherboards() {
-        return motherboards;
-    }
-
-    public List<String> getCpus() {
-        return cpus;
-    }
-
-    public List<String> getGpus() {
-        return gpus;
-    }
-
-    public List<String> getRams() {
-        return rams;
-    }
-
-    public List<String> getStorages() {
-        return storages;
-    }
-
- 
     public void createComponent() {
         String[] partTypes = {"Pievienot Motherboard", "Pievienot CPU", "Pievienot GPU", "Pievienot RAM", "Pievienot Storage", "Atpakaļ"};
 
@@ -185,5 +164,76 @@ public class Create_Com {
         }
         return components;
     }
+    
+    public void deleteComponent() {
+        String[] componentTypes = {"Motherboard", "CPU", "GPU", "RAM", "Storage"};
+
+        // Izvēlas komponentes tipu
+        String selectedType = (String) JOptionPane.showInputDialog(
+                null,
+                "Izvēlieties komponentes tipu dzēšanai:",
+                "Komponentes dzēšana",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                componentTypes,
+                componentTypes[0]
+        );
+
+        if (selectedType == null)  Izvelne.main(new String[]{}); // Lietotājs atcēla izvēli
+
+        List<String> components = getComponentsFromDBList(selectedType);
+        if (components.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nav pieejamu " + selectedType + " komponentu dzēšanai!");
+            return;
+        }
+
+        // Ļauj lietotājam izvēlēties komponenti dzēšanai
+        String selectedComponent = (String) JOptionPane.showInputDialog(
+                null,
+                "Izvēlieties komponenti dzēšanai:",
+                "Komponentes dzēšana",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                components.toArray(),
+                components.get(0)
+        );
+
+        if (selectedComponent == null) Izvelne.main(new String[]{}); // Lietotājs atcēla izvēli
+
+        int confirm = JOptionPane.showConfirmDialog(
+                null,
+                "Vai tiešām vēlaties dzēst komponenti: " + selectedComponent + "?",
+                "Apstiprinājums",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (deleteComponentFromDB(selectedType, selectedComponent)) {
+                JOptionPane.showMessageDialog(null, "Komponente veiksmīgi dzēsta!");
+                Izvelne.main(new String[]{});
+            } else {
+                JOptionPane.showMessageDialog(null, "Kļūda, dzēšot komponenti!");
+                Izvelne.main(new String[]{});
+            }
+        }else {
+        	Izvelne.main(new String[]{});
+        }
+    }
+
+    private boolean deleteComponentFromDB(String type, String componentName) {
+        String deleteComponentQuery = "DELETE FROM Komponente WHERE type = ? AND name = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(deleteComponentQuery)) {
+            pstmt.setString(1, type);
+            pstmt.setString(2, componentName);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Kļūda, dzēšot komponenti: " + e.getMessage());
+        }
+        return false;
+    }
+
+    
 
 }

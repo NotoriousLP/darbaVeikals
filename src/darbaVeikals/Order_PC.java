@@ -10,21 +10,32 @@ public class Order_PC {
         if (createdPCs.isEmpty()) { // Pārbauda, vai datoru saraksts ir tukšs
             JOptionPane.showMessageDialog(null, "Nav pieejamu datoru pasūtīšanai!");
             Izvelne.main(new String[]{});
-            return;
         }
 
         // Ievada klienta informāciju
         String vards = JOptionPane.showInputDialog("Ievadiet savu vārdu:");
-        if (vards == null || vards.isEmpty()) return;
+        if (vards == null || vards.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Vārds nevar būt tukšs!");
+            Izvelne.main(new String[]{});  // Ja "Cancel" vai tukšs, tiek pārtraukta funkcija
+        }
 
         String uzvards = JOptionPane.showInputDialog("Ievadiet savu uzvārdu:");
-        if (uzvards == null || uzvards.isEmpty()) return;
+        if (uzvards == null || uzvards.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Uzvārds nevar būt tukšs!");
+            Izvelne.main(new String[]{});  // Ja "Cancel" vai tukšs, tiek pārtraukta funkcija
+        }
 
         String telefons = JOptionPane.showInputDialog("Ievadiet savu telefona numuru:");
-        if (telefons == null || telefons.isEmpty()) return;
+        if (telefons == null || telefons.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Telefona numurs nevar būt tukšs!");
+            Izvelne.main(new String[]{});  // Ja "Cancel" vai tukšs, tiek pārtraukta funkcija
+        }
 
         String adrese = JOptionPane.showInputDialog("Ievadiet savu mājas adresi:");
-        if (adrese == null || adrese.isEmpty()) return;
+        if (adrese == null || adrese.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Adrese nevar būt tukša!");
+            Izvelne.main(new String[]{});  // Ja "Cancel" vai tukšs, tiek pārtraukta funkcija
+        }
 
         // Izvēlas datoru no pieejamajiem datoriem
         String selectedPC = choosePC(createdPCs);

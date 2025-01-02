@@ -14,7 +14,7 @@ public class DatabaseConnection {
         try {
             if (connection == null || connection.isClosed()) { // Pārbauda, vai savienojums ir slēgts
                 connection = DriverManager.getConnection(DB_URL); // Mēģina atvērt jaunu savienojumu
-                System.out.println("Atvērts jauns savienojums ar datubāzi.");
+                //System.out.println("Atvērts jauns savienojums ar datubāzi.");
             }
         } catch (SQLException e) {
             System.err.println("Kļūda, atverot savienojumu: " + e.getMessage());
@@ -32,7 +32,7 @@ public class DatabaseConnection {
             stmt.execute("CREATE TABLE IF NOT EXISTS Dators (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)");
             stmt.execute("CREATE TABLE IF NOT EXISTS Klienti (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, surname TEXT, phone TEXT, address TEXT, computer_id INTEGER, FOREIGN KEY(computer_id) REFERENCES Computers(id))");
 
-            System.out.println("Tabulas veiksmīgi izveidotas vai jau pastāv.");
+           // System.out.println("Tabulas veiksmīgi izveidotas vai jau pastāv.");
         } catch (SQLException e) {
             System.err.println("Kļūda, izveidojot tabulas: " + e.getMessage());
         }

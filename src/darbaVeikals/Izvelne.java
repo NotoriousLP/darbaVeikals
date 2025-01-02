@@ -18,11 +18,11 @@ public class Izvelne {
         DatabaseConnection.initializeDatabase();
         while (true) {
         
-            JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+            JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
 
             String[] options = {
                 "Pasūtīt datoru", "Izveidot datoru", "Pievienot komponentes", 
-                "Apskatīt klientus", "Apskatīt datorus", "Iziet"
+                "Apskatīt klientus", "Apskatīt datorus", "Izdzēst komponentes", "Izdzēst datorus", "Iziet"
             };
 
        
@@ -53,8 +53,13 @@ public class Izvelne {
                         case "Apskatīt datorus":
                         	createPC.viewPCs(); 
                             break;
+                        case "Izdzēst komponentes":
+                        	createComponents.deleteComponent(); 
+                            break;
+                        case "Izdzēst datorus":
+                        	createPC.deletePC(); 
+                            break;       
                         default:
-                    
                             System.exit(0);
                             break;
                     }
